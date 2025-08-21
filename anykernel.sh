@@ -4,7 +4,7 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=N0Kontzzz by bimoalfarrabi (thanks to EmanuelCN & Impqxr) !!!
+kernel.string=N0Kontzzz by bimoalfarrabi (thanks to EmanuelCN & Impqxr)
 do.devicecheck=1
 do.modules=0
 do.systemless=1
@@ -34,38 +34,19 @@ ramdisk_compression=auto;
 set_perm_recursive 0 0 750 750 $ramdisk/*;
 set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
 
-# Auto‑detect variant from zip name
+# Auto-detect variant from zip name
 case "$ZIPFILE" in
-  *-miui*)    v=miui;;
-  *N0Kontzzz*) v=default;;
+  *N0Kernel*) v=default;;
 esac
 
-# If none are detected (adb sideload), let the user pick
-if [ -z "$v" ]; then
-  set -- miui default
-  i=1; n=$#
-  prev_option=""
-  ui_print "Select DTBO variant:"
-  while :; do
-    eval "current_option=\${$i}"
-    # Only print when the option changes
-    if [ "$current_option" != "$prev_option" ]; then
-      ui_print "> Option selected: $current_option  (Vol–=Next  Vol+=Select)"
-      prev_option="$current_option"
-    fi
-    ev=$(getevent -lc1 2>/dev/null | tr -d '\r')
-    case $ev in
-      *KEY_VOLUMEDOWN*DOWN*)
-        i=$(( i % n + 1 ))
-        ;;
-      *KEY_VOLUMEUP*DOWN*)
-        v="$current_option"
-        break
-        ;;
-    esac
-    sleep 0.1
-  done
-fi
+# Miui detection
+build="$(file_getprop /vendor/build.prop "persist.sys.miui_gnss_pc")"
+case "$build" in
+    true)
+      v=miui
+      ui_print "  -> MIUI ROM is detected!";
+      ;;
+esac
 
 # Select default if still unset
 [ -z "$v" ] && v=default
