@@ -37,15 +37,16 @@ set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
 # Auto-detect variant from zip name
 case "$ZIPFILE" in
   *N0Kernel*) v=default;;
+  *-miui)     v=miui;;
 esac
 
-# Miui detection
-build="$(file_getprop /vendor/build.prop "persist.sys.miui_gnss_pc")"
-case "$build" in
-    true)
+# Automatic miui detection
+region="$(file_getprop /vendor/build.prop "ro.vendor.miui.build.region")"
+case "$region" in
+  cn|in|ru|id|eu|tr|tw|gb|global|mx|jp|kr|lm|cl|mi)
       v=miui
-      ui_print "  -> MIUI ROM is detected!";
-      ;;
+      ui_print "  -> MIUI ROM is detected!"
+    ;;
 esac
 
 # Select default if still unset
